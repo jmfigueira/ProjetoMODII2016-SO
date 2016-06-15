@@ -1,38 +1,38 @@
-﻿using NodeFS.Model;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-
-namespace NodeFS.Controller
+﻿namespace NodeFS.Controller
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Windows.Forms;
+
+    using NodeFS.Model;
+
+    using UsersAndGroups.Controller;
+
+    /// <summary>
+    ///     The general control.
+    /// </summary>
     public class GeneralControl
     {
-        #region Atributes
-
-        private static List<File> _files;
         private static List<Directory> _directorys;
 
-        #endregion
+        private static List<File> _files;
 
-        #region Constructor
         public GeneralControl()
         {
-            if (_files == null)
-                _files = new List<File>();
-            if (_directorys == null)
-                _directorys = new List<Directory>();
+            if (_files == null) _files = new List<File>();
+            if (_directorys == null) _directorys = new List<Directory>();
         }
-        #endregion
 
-        #region Directory
-
-        #region Public Methods
-        //OK
+        // OK
         public void CreateDirectory(TreeView root, string name, bool[] isChecked, string userName)
         {
             try
             {
-                InsertDirectory(name, string.Format("{0}\\{1}", root.SelectedNode.FullPath, name), isChecked, userName);
+                this.InsertDirectory(
+                    name, 
+                    string.Format("{0}\\{1}", root.SelectedNode.FullPath, name), 
+                    isChecked, 
+                    userName);
                 root.SelectedNode.Nodes.Add(name);
                 root.ExpandAll();
             }
@@ -42,53 +42,25 @@ namespace NodeFS.Controller
             }
         }
 
-        #endregion
-
-        #region Private Methods
-        //OK
-        private void InsertDirectory(string name, string fullPath, bool[] isChecked, string userName)
-        {
-            Directory directory = new Directory
-            {
-                Nome = name,
-                Caminho = fullPath,
-                Permissoes = new Permitions
-                {
-                    Leitura = isChecked[0],
-                    Escrita = isChecked[1],
-                    Execucao = isChecked[2]
-                },
-                User = userName
-            };
-            _directorys.Add(directory);
-        }
-
-        #endregion
-
-        #endregion
-
-        #region File
-
-        #region Public Methods
-        //OK
+        // OK
         public void CreateFile(TreeView root, string nome, string conteudo, bool[] permissoes, string userName)
         {
             try
             {
-                File arquivo = new File();
+                var arquivo = new File();
 
                 arquivo.Nome = nome;
                 arquivo.Conteudo = conteudo;
                 arquivo.Permissoes = new Permitions
-                {
-                    Leitura = permissoes[0],
-                    Escrita = permissoes[1],
-                    Execucao = permissoes[2]
-                };
+                                         {
+                                             Leitura = permissoes[0], 
+                                             Escrita = permissoes[1], 
+                                             Execucao = permissoes[2]
+                                         };
                 arquivo.CaminhoCompleto = string.Format("{0}\\{1}", root.SelectedNode.FullPath, arquivo.Nome);
                 arquivo.Caminho = root.SelectedNode.FullPath.Replace(arquivo.Nome, string.Empty);
                 arquivo.User = userName;
-                InsertFile(root, arquivo);
+                this.InsertFile(root, arquivo);
             }
             catch
             {
@@ -96,22 +68,68 @@ namespace NodeFS.Controller
             }
         }
 
-        //OK
+        public bool Delete(TreeView root, string userName)
+        {
+            if (root.SelectedNode.Text.Contains("."))
+            {
+                foreach (var file in _files)
+                {
+                    if (root.SelectedNode.Text == file.Nome && root.SelectedNode.FullPath == file.CaminhoCompleto)
+                    {
+                        if (file.User == userName || file.Permissoes.Escrita.Equals(true))
+                        {
+                            root.SelectedNode.Remove();
+                            _files.Remove(file);
+                            MessageBox.Show(
+                                "Arquivo excluído com sucesso!", 
+                                "Sucesso", 
+                                MessageBoxButtons.OK, 
+                                MessageBoxIcon.Information);
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            foreach (var dir in _directorys)
+            {
+                if (root.SelectedNode.Text == dir.Nome && root.SelectedNode.FullPath == dir.Caminho)
+                {
+                    if (dir.User == userName || dir.Permissoes.Escrita.Equals(true))
+                    {
+                        root.SelectedNode.Remove();
+                        _directorys.Remove(dir);
+                        MessageBox.Show(
+                            "Diretório excluído com sucesso!", 
+                            "Sucesso", 
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Information);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        // OK
         public void EditFile(TreeView root, string nome, string conteudo, bool[] permissoes)
         {
             try
             {
-                File arquivo = new File();
+                var arquivo = new File();
 
                 arquivo.Nome = nome;
                 arquivo.Conteudo = conteudo;
                 arquivo.Permissoes = new Permitions
-                {
-                    Leitura = permissoes[0],
-                    Escrita = permissoes[1],
-                    Execucao = permissoes[2]
-                };
-                UpdateFile(arquivo);
+                                         {
+                                             Leitura = permissoes[0], 
+                                             Escrita = permissoes[1], 
+                                             Execucao = permissoes[2]
+                                         };
+                this.UpdateFile(arquivo);
             }
             catch
             {
@@ -119,11 +137,11 @@ namespace NodeFS.Controller
             }
         }
 
-        //OK
+        // OK
         public File IsEditableFile(TreeNode file, string userContext)
         {
-            File fileEx = new File();
-            foreach (File fileLocal in _files)
+            var fileEx = new File();
+            foreach (var fileLocal in _files)
             {
                 if (fileLocal.Nome == file.Text && fileLocal.CaminhoCompleto == file.FullPath)
                 {
@@ -132,46 +150,97 @@ namespace NodeFS.Controller
                         fileEx = fileLocal;
                         break;
                     }
-                    else if (fileLocal.Permissoes.Escrita)
+
+                    if (fileLocal.Permissoes.Escrita)
                     {
                         fileEx = fileLocal;
                         break;
                     }
                 }
             }
+
             return fileEx;
         }
 
         public File ViewFile(TreeView root, string userName)
         {
-            foreach (File file in _files)
+            foreach (var file in _files)
             {
                 if (file.Nome == root.SelectedNode.Text && file.CaminhoCompleto == root.SelectedNode.FullPath)
                 {
-                    if (file.User == userName)
-                        return file;
-                    else if (file.Permissoes.Escrita.Equals(true))
+                    if (file.User == userName) return file;
+                    if (file.Permissoes.Escrita.Equals(true))
                     {
-                        UsersAndGroups.Controller.GeneralController user = new UsersAndGroups.Controller.GeneralController();
-                        bool[] isPermitions = user.PermitionsUser(userName);
+                        var user = new GeneralController();
+                        var isPermitions = user.PermitionsUser(userName);
 
-                        if (isPermitions[1] && file.Permissoes.Leitura.Equals(true))
-                            return file;
-                        else if (isPermitions[0])
-                            return file;
+                        if (isPermitions[1] && file.Permissoes.Leitura.Equals(true)) return file;
+                        if (isPermitions[0]) return file;
                     }
                 }
             }
+
             return null;
         }
 
-        #endregion
+        /// <summary>
+        ///     The insert directory.
+        /// </summary>
+        /// <param name="name">
+        ///     The name.
+        /// </param>
+        /// <param name="fullPath">
+        ///     The full path.
+        /// </param>
+        /// <param name="isChecked">
+        ///     The is checked.
+        /// </param>
+        /// <param name="userName">
+        ///     The user name.
+        /// </param>
+        private void InsertDirectory(string name, string fullPath, bool[] isChecked, string userName)
+        {
+            var directory = new Directory
+                                {
+                                    Nome = name, 
+                                    Caminho = fullPath, 
+                                    Permissoes =
+                                        new Permitions
+                                            {
+                                                Leitura = isChecked[0], 
+                                                Escrita = isChecked[1], 
+                                                Execucao = isChecked[2]
+                                            }, 
+                                    User = userName
+                                };
+            _directorys.Add(directory);
+        }
 
-        #region Private Methods
-        //OK
+        /// <summary>
+        ///     The insert file.
+        /// </summary>
+        /// <param name="root">
+        ///     The root.
+        /// </param>
+        /// <param name="file">
+        ///     The file.
+        /// </param>
+        private void InsertFile(TreeView root, File file)
+        {
+            root.SelectedNode.Nodes.Add(file.Nome);
+            root.ExpandAll();
+            _files.Add(file);
+        }
+
+        /// <summary>
+        ///     The update file.
+        /// </summary>
+        /// <param name="file">
+        ///     The file.
+        /// </param>
         private void UpdateFile(File file)
         {
-            foreach (File fl in _files)
+            foreach (var fl in _files)
             {
                 if (fl.Nome == file.Nome)
                 {
@@ -181,60 +250,8 @@ namespace NodeFS.Controller
                     break;
                 }
             }
+
             _files.Add(file);
         }
-        //OK
-        private void InsertFile(TreeView root, File file)
-        {
-            root.SelectedNode.Nodes.Add(file.Nome);
-            root.ExpandAll();
-            _files.Add(file);
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Generic
-
-        public bool Delete(TreeView root, string userName)
-        {
-            if (root.SelectedNode.Text.Contains("."))
-            {
-                foreach (File file in _files)
-                {
-                    if (root.SelectedNode.Text == file.Nome && root.SelectedNode.FullPath == file.CaminhoCompleto)
-                    {
-                        if (file.User == userName || file.Permissoes.Escrita.Equals(true))
-                        {
-                            root.SelectedNode.Remove();
-                            _files.Remove(file);
-                            MessageBox.Show("Arquivo excluído com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-            else
-            {
-                foreach (Directory dir in _directorys)
-                {
-                    if (root.SelectedNode.Text == dir.Nome && root.SelectedNode.FullPath == dir.Caminho)
-                    {
-                        if (dir.User == userName || dir.Permissoes.Escrita.Equals(true))
-                        {
-                            root.SelectedNode.Remove();
-                            _directorys.Remove(dir);
-                            MessageBox.Show("Diretório excluído com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        }
-
-        #endregion
     }
 }

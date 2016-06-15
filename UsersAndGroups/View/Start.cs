@@ -1,37 +1,38 @@
-﻿using System;
-using System.Windows.Forms;
-using UsersAndGroups.Controller;
-
-namespace UsersAndGroups.View
+﻿namespace UsersAndGroups.View
 {
+    using System;
+    using System.Windows.Forms;
+
+    using UsersAndGroups.Controller;
+
     public partial class Start : Form
     {
-        private FormControl _control;
+        private readonly FormControl _control;
 
         public Start(Form login)
         {
-            InitializeComponent();
-            _control = new FormControl(this.root, this, login);
-        }
-
-        private void btnUser_Click(object sender, EventArgs e)
-        {
-            _control.User();
-        }
-
-        private void btnGroup_Click(object sender, EventArgs e)
-        {
-            _control.Group();
-        }
-
-        private void btnSair_Click(object sender, EventArgs e)
-        {
-            _control.Exit();
+            this.InitializeComponent();
+            this._control = new FormControl(this.root, this, login);
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            _control.Delete();
+            this._control.Delete();
+        }
+
+        private void btnGroup_Click(object sender, EventArgs e)
+        {
+            this._control.Group();
+        }
+
+        private void btnSair_Click(object sender, EventArgs e)
+        {
+            this._control.Exit();
+        }
+
+        private void btnUser_Click(object sender, EventArgs e)
+        {
+            this._control.User();
         }
     }
 }

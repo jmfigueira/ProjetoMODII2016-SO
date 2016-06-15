@@ -1,54 +1,56 @@
-﻿using NodeFS.Controller;
-using System;
-using System.Windows.Forms;
-
-namespace NodeFS.View
+﻿namespace NodeFS.View
 {
+    using System;
+    using System.Windows.Forms;
+
+    using NodeFS.Controller;
+
     public partial class Node : Form
     {
-        private FormControl _control;
-
-        public void SetName(string name)
-        {
-            lblLogin.Text = name;
-        }
+        private readonly FormControl _control;
 
         public Node(Form form)
         {
-            InitializeComponent();
-            _control = new FormControl(this.root, form, this);
-            //bloquear o diretório para leitura  para outros usuários caso o usuário que criou tenha marcado leitura = false
-            //O mesmo aplica-se as outras ideias
+            this.InitializeComponent();
+            this._control = new FormControl(this.root, form, this);
+
+            // bloquear o diretório para leitura  para outros usuários caso o usuário que criou tenha marcado leitura = false
+            // O mesmo aplica-se as outras ideias
         }
 
-        private void btnDir_Click(object sender, EventArgs e)
+        public void SetName(string name)
         {
-            _control.Directory(lblLogin.Text);
+            this.lblLogin.Text = name;
         }
 
         private void btnArq_Click(object sender, EventArgs e)
         {
-            _control.File(lblLogin.Text);
-        }
-
-        private void btnEdit_Click(object sender, EventArgs e)
-        {
-            _control.Edit(lblLogin.Text);
+            this._control.File(this.lblLogin.Text);
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            _control.Delete(lblLogin.Text);
+            this._control.Delete(this.lblLogin.Text);
+        }
+
+        private void btnDir_Click(object sender, EventArgs e)
+        {
+            this._control.Directory(this.lblLogin.Text);
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            this._control.Edit(this.lblLogin.Text);
         }
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            _control.Exit();
+            this._control.Exit();
         }
 
         private void btnView_Click(object sender, EventArgs e)
         {
-            _control.View(lblLogin.Text);
+            this._control.View(this.lblLogin.Text);
         }
     }
 }

@@ -1,37 +1,39 @@
-﻿using NodeFS.View;
-using System.Windows.Forms;
-using UsersAndGroups.View;
-
-namespace Login.Controller
+﻿namespace Login.Controller
 {
+    using System.Windows.Forms;
+
+    using NodeFS.View;
+
+    using UsersAndGroups.View;
+
+    /// <summary>
+    ///     The form control.
+    /// </summary>
     public class FormControl
     {
-        #region Atributes
-        private ControllerLogin _control;
-        private static Start _principal;
         private static Node _inicio;
-        #endregion
 
-        #region Constructor
+        private static Start _principal;
+
+        private readonly ControllerLogin _control;
+
         public FormControl(Form form)
         {
             _principal = new Start(form);
-            _control = new ControllerLogin();
+            this._control = new ControllerLogin();
             _inicio = new Node(form);
         }
-        #endregion
 
-        #region Public Methods
         public void Login(TextBox textName, TextBox textPass, Form thisForm)
         {
-            if (textName.Text == "Admin" && textPass.Text == "Admin")
+            if (textName.Text == @"Admin" && textPass.Text == @"Admin")
             {
                 thisForm.Hide();
                 textName.Text = string.Empty;
                 textPass.Text = string.Empty;
                 _principal.Show();
             }
-            else if (_control.ValidUser(textName.Text, textPass.Text))
+            else if (this._control.ValidUser(textName.Text, textPass.Text))
             {
                 thisForm.Hide();
                 _inicio.SetName(textName.Text);
@@ -44,6 +46,5 @@ namespace Login.Controller
                 MessageBox.Show("O usuário não existe!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        #endregion
     }
 }

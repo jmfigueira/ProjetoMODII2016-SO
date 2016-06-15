@@ -1,25 +1,32 @@
-﻿using NodeFS.Controller;
-using System;
-using System.Windows.Forms;
-
-namespace NodeFS.View
+﻿namespace NodeFS.View
 {
+    using System;
+    using System.Windows.Forms;
+
+    using NodeFS.Controller;
+
     public partial class NewDirectory : Form
     {
-        private FormControl _control;
-        private string _userName;
+        private readonly FormControl _control;
+
+        private readonly string _userName;
 
         public NewDirectory(TreeView root, string userName)
         {
-            InitializeComponent();
-            _control = new FormControl(root, null, this);
-            _control.DefineDirectory(textDir);
-            _userName = userName;
+            this.InitializeComponent();
+            this._control = new FormControl(root, null, this);
+            this._control.DefineDirectory(this.textDir);
+            this._userName = userName;
         }
 
         private void btnSend_Click(object sender, EventArgs e)
         {
-            _control.SaveDirectory(checkRead, checkWrite, checkExec, textName.Text, _userName);
+            this._control.SaveDirectory(
+                this.checkRead, 
+                this.checkWrite, 
+                this.checkExec, 
+                this.textName.Text, 
+                this._userName);
         }
     }
 }

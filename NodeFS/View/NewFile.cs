@@ -1,26 +1,52 @@
-﻿using NodeFS.Controller;
-using System;
-using System.Windows.Forms;
-
-namespace NodeFS.View
+﻿namespace NodeFS.View
 {
+    using System;
+    using System.Windows.Forms;
+
+    using NodeFS.Controller;
+
     public partial class NewFile : Form
     {
-        private FormControl _control;
-        private string _userName;
+        private readonly FormControl _control;
 
-        public NewFile(TreeView root, string nameArq, string txtArq, bool[] lstPerm, bool isEdit, bool isPermit, string userName)
+        private readonly string _userName;
+
+        public NewFile(
+            TreeView root, 
+            string nameArq, 
+            string txtArq, 
+            bool[] lstPerm, 
+            bool isEdit, 
+            bool isPermit, 
+            string userName)
         {
-            InitializeComponent();
-            _control = new FormControl(root, null, this);
-            _userName = userName;
-            _control.EditableFile(nameArq, textArqName, textArq, chLeitura, 
-                chEscrita, chExecucao, lstPerm, txtArq, btnSave, isEdit, isPermit);
+            this.InitializeComponent();
+            this._control = new FormControl(root, null, this);
+            this._userName = userName;
+            this._control.EditableFile(
+                nameArq, 
+                this.textArqName, 
+                this.textArq, 
+                this.chLeitura, 
+                this.chEscrita, 
+                this.chExecucao, 
+                lstPerm, 
+                txtArq, 
+                this.btnSave, 
+                isEdit, 
+                isPermit);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            _control.CreateOrEditFile(btnSave, textArqName, chLeitura, chEscrita, chExecucao, textArq, _userName);
+            this._control.CreateOrEditFile(
+                this.btnSave, 
+                this.textArqName, 
+                this.chLeitura, 
+                this.chEscrita, 
+                this.chExecucao, 
+                this.textArq, 
+                this._userName);
         }
     }
 }
